@@ -15,10 +15,10 @@ import (
 	"encoding/csv"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"os"
 	"strconv"
+	"time"
 )
 
 func main() {
@@ -46,30 +46,29 @@ func main() {
 	for scanner.Scan() {
 		slice = make([]string, 0)
 		fmt.Print("--")
+		start := time.Now()
 		res, err := http.Get(scanner.Text())
 		if err != nil {
 			// handle error
 			panic(err)
 		}
+		elapsed := time.Since(start)
 
 		defer res.Body.Close()
-
-		// start := time.Now()
 
 		body, err := ioutil.ReadAll(res.Body)
 		if err != nil {
 			panic(err)
 		}
-		// elapsed := time.Since(start)
+		time := int(elapsed / time.Millisecond)
 		text := scanner.Text()
 		url := text[8:len(text)]
 		slice = append(slice, url)
 
 		l := len(body)
 		slice = append(slice, strconv.Itoa(res.StatusCode))
-
-		// slice = append(slice, strconv.Itoa(elapsed)
 		slice = append(slice, strconv.Itoa(l))
+		slice = append(slice, strconv.Itoa(time))
 		// fmt.Println(res.StatusCode)
 		// fmt.Println(l)
 		// log.Println(elapsed)
@@ -80,7 +79,7 @@ func main() {
 		slice = make([]string, 0)
 
 	}
-	log.Println("done")
+	fmt.Println("done")
 	// conn, err := net.Dial("tcp", "example.com:80")
 	// if err != nil {
 	// 	panic(err)
